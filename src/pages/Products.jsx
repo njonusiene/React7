@@ -1,57 +1,57 @@
-// ProductsPage.jsx
 import "../scss/products.scss"
 import "../scss/buttons.scss"
 import "../scss/nav.scss"
-import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
 
-const BASE_URL = "https://sophisticated-humane-dandelion.glitch.me/";
+import React, { useEffect, useState } from 'react';
+
 
 const Products = () => {
-  const location = useLocation();
-  const [products, setProducts] = useState([]);
-
+  const BASE_URL = "https://sophisticated-humane-dandelion.glitch.me/"
+  const [data, setData] = useState([])
+  
   useEffect(() => {
-    fetch(BASE_URL)
-      .then((resp) => resp.json())
-      .then((data) => setProducts(data))
-      .catch((error) => console.log(error));
-  }, []);
+      const fetchData = async () => {
+          const resp = await fetch(BASE_URL)
+          const result = await resp.json()
+          setData(result)
+      }
+  
+      fetchData()
+  }, [])
 
-  const deleteProduct = (id) => {
-    fetch(BASE_URL + "/" + id, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
-      })
-      .catch((error) => console.log(error));
-  };
+  const handleDelete = async (id) => {
+    try {
+        const resp = await fetch(BASE_URL + id, {
+          method: "DELETE",
+          })
+
+        if(resp.ok) {     
+          const result = await resp.json()
+
+          alert(id)
+        }
+
+    } catch (error) {
+        console.error("Error during DELETE request:", error)
+    }
+  }
+  
 
   return (
-    <div>
-      <nav>
-        <NavLink to="/products" className='active'>
-          Products
-        </NavLink>
-        <NavLink to="/form" className='active'>
-          Form
-        </NavLink>
-      </nav>
-      <section id="app" className="products">
-        {products.map((x) => (
-          <div key={x.id} className="product">
-            <img src={x.image} alt={x.title} />
-            <p>{x.title}</p>
-            <p className="price">€{x.price}</p>
-            <button className="button" onClick={() => deleteProduct(x.id)}>
-              Ištrinti
-            </button>
-          </div>
-        ))}
-      </section>
-    </div>
-  );
-};
+    <section id="app" className="products">
+      {data.map((el, index) => (
+        <div className="product" key={index}>
+          <img src={el.image} alt={el.title}/>
+          <p>{el.title}</p>
+          <p className="price">{el.price}</p>
+          <button className="button" onClick={() => handleDelete(el.id)}>Ištrinti</button>
+
+        </div>
+      ))}
+      
+    </section>
+  )
+}
+
 
 export default Products;

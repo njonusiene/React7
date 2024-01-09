@@ -1,86 +1,48 @@
 import "../scss/form.scss"
 import React, { useState } from 'react'
-import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-
-const BASE_URL = "https://sophisticated-humane-dandelion.glitch.me/"
+import { useNavigate } from 'react-router-dom'
 
 const Form = () => {
+
+  const BASE_URL = "https://sophisticated-humane-dandelion.glitch.me/"
+  const [inputs, setInputs] = useState({})
   const navigate = useNavigate()
-  const location = useLocation()
 
-  const [formData, setFormData] = useState({
-    img: '',
-    title: '',
-    price: '',
-  })
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  const handleInput = (e) => {
+    const {name, value} = e.target
+    setInputs({...inputs, [name]: value})
   }
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-  
-    // Tikriname, ar visi įvesties laukai yra užpildyti
-    if (!formData.img || !formData.title || !formData.price) {
-      alert('Užpildykite visus laukelius :)');
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    try {
+        const resp = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(inputs)
+        })
+
+        if(resp.ok) {     
+        const result = await resp.json()
+        alert("Prekė įkelta sėkmingai :)")
+        navigate("/")
+        }
+
+    } catch (error) {
+        console.error("Error during POST request:", error)
     }
-  
-    fetch(BASE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((resp) => resp.json())
-      .then(() => {
-        alert('Product added successfully');
-        setFormData({ img: '', title: '', price: '' });
-        navigate('/products');
-      })
-      .catch((error) => console.log(error));
   }
 
   return (
-    <div>
-      <nav>
-        <NavLink to="/products" className={location.pathname === '/products' ? 'active' : ''}>
-          Products
-        </NavLink>
-        <NavLink to="/form" className={location.pathname === '/form' ? 'active' : ''}>
-          Form
-        </NavLink>
-      </nav>
-      <h1>Pridėti prekę</h1>
-      <form onSubmit={handleFormSubmit}>
-        <input
-          type="url"
-          name="img"
-          placeholder="img url"
-          value={formData.img}
-          onChange={handleInputChange}
-        />
-        <input
-          type="text"
-          name="title"
-          placeholder="title"
-          value={formData.title}
-          onChange={handleInputChange}
-        />
-        <input
-          type="number"
-          step="0.01"
-          name="price"
-          placeholder="price"
-          value={formData.price}
-          onChange={handleInputChange}
-        />
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <form action="#">
+      <input name="image" type="url" placeholder="img" onChange={handleInput}/>
+      <input name="title" type="text" placeholder="title" onChange={handleInput}/>
+      <input name="price" type="number" step="0.01" placeholder="price" onChange={handleInput}/>
+      <button onClick={handleSubmit}>Submit</button>
+    </form>
   )
 }
 
