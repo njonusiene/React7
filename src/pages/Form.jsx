@@ -38,7 +38,7 @@ const Form = () => {
 
   return (
     <form action="#">
-      <input name="image" type="url" placeholder="img" onChange={handleInput}/>
+      <input name="image" type="url" placeholder="img url" onChange={handleInput}/>
       <input name="title" type="text" placeholder="title" onChange={handleInput}/>
       <input name="price" type="number" step="0.01" placeholder="price" onChange={handleInput}/>
       <button onClick={handleSubmit}>Submit</button>
